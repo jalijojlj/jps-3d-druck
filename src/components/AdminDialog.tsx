@@ -244,11 +244,11 @@ export function AdminDialog({
               <label>Preise live anpassen (aktuell: {Math.round((priceMultiplier - 1) * 100)}%)</label>
               <div className="admin-filter-tabs" style={{ flexWrap: 'wrap' }}>
                 {[
-                  { label: '-75 %', mult: 0.25 },
-                  { label: '-70 % (Standard)', mult: 0.3 },
+                  { label: '-80 %', mult: 0.2 },
+                  { label: '-76 % (Standard)', mult: 0.24 },
+                  { label: '-70 %', mult: 0.3 },
                   { label: '-60 %', mult: 0.4 },
                   { label: '-50 %', mult: 0.5 },
-                  { label: '-40 %', mult: 0.6 },
                   { label: 'Normal (0 %)', mult: 1.0 },
                 ].map((opt) => (
                   <button

@@ -47,6 +47,7 @@ $batch = @(
     data = $rows
   }
 )
-$batch | ConvertTo-Json -Depth 6 | Out-File -FilePath $batchFile -Encoding utf8
+$json = ConvertTo-Json -InputObject @($batch) -Depth 6
+[System.IO.File]::WriteAllText($batchFile, $json, (New-Object System.Text.UTF8Encoding($false)))
 gsheets mutate batch $sheetId -f $batchFile
 Write-Output "Synced $($orders.Count) orders to Google Sheet $sheetId"
