@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/config.ts","./src/main.tsx","./src/types.ts","./src/components/admindialog.tsx","./src/components/cartcheckoutdialog.tsx","./src/components/letteringconfigurator.tsx","./src/components/productcard.tsx","./src/components/productmodal.tsx","./src/data/products.ts","./src/lib/dialogutils.ts","./src/lib/orders.ts"],"version":"5.8.3"}
