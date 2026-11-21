@@ -58,26 +58,45 @@ export function setWebhookOverride(url: string): void {
   }
 }
 
+async function postWithRetry(url: string, options: RequestInit, retries = 3): Promise<Response> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      const resp = await fetch(url, options);
+      if (resp.ok) return resp;
+    } catch (err) {
+      lastErr = err;
+    }
+    if (attempt < retries - 1) {
+      await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
+    }
+  }
+  throw lastErr ?? new Error('Request failed after retries');
+}
+
 export async function submitOrder(order: Order): Promise<{
   order: Order;
   syncedToSheets: boolean;
   message?: string;
 }> {
+  // Always save immediately to localStorage FIRST so zero data can ever be lost
+  const initialLocal: Order = { ...order, syncedToSheets: false };
+  saveLocalOrders([initialLocal, ...getLocalOrders().filter((o) => o.id !== order.id)]);
+
   let syncedToSheets = false;
   let message: string | undefined;
-
   const customWebhook = getWebhookOverride();
 
   try {
     if (customWebhook) {
-      const resp = await fetch(customWebhook, {
+      const resp = await postWithRetry(customWebhook, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'create', order }),
       });
       if (resp.ok) syncedToSheets = true;
     } else {
-      const resp = await fetch('/api/orders', {
+      const resp = await postWithRetry('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'create', order }),
@@ -89,7 +108,7 @@ export async function submitOrder(order: Order): Promise<{
       }
     }
   } catch {
-    // Fallback cleanly to local storage
+    // Kept safely in localStorage with syncedToSheets: false for auto-retry
   }
 
   const finalOrder: Order = { ...order, syncedToSheets };
@@ -99,10 +118,19 @@ export async function submitOrder(order: Order): Promise<{
   return { order: finalOrder, syncedToSheets, message };
 }
 
+export async function syncPendingLocalOrders(): Promise<void> {
+  const unsynced = getLocalOrders().filter((o) => o.syncedToSheets === false);
+  for (const order of unsynced) {
+    await submitOrder(order);
+  }
+}
+
 export async function fetchAllOrders(): Promise<{
   orders: Order[];
   connected: boolean;
+  priceMultiplier?: number;
 }> {
+  await syncPendingLocalOrders();
   const local = getLocalOrders();
   const customWebhook = getWebhookOverride();
 
@@ -111,8 +139,12 @@ export async function fetchAllOrders(): Promise<{
     if (resp.ok) {
       const data = await resp.json();
       const connected = customWebhook ? true : Boolean(data.connected);
+      const serverMult =
+        typeof data.settings?.priceMultiplier === 'number'
+          ? data.settings.priceMultiplier
+          : undefined;
+
       if (connected && Array.isArray(data.orders)) {
-        // Merge remote + any unsynced local orders
         const remoteMap = new Map<string, Order>();
         for (const o of data.orders) {
           remoteMap.set(o.id, { ...o, syncedToSheets: true });
@@ -126,15 +158,27 @@ export async function fetchAllOrders(): Promise<{
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         saveLocalOrders(merged);
-        return { orders: merged, connected: true };
+        return { orders: merged, connected: true, priceMultiplier: serverMult };
       }
-      return { orders: local, connected: false };
+      return { orders: local, connected: false, priceMultiplier: serverMult };
     }
   } catch {
-    // Offline or local dev without Vercel API
+    // Offline fallback
   }
 
   return { orders: local, connected: false };
+}
+
+export async function saveServerPriceMultiplier(priceMultiplier: number): Promise<void> {
+  try {
+    await postWithRetry('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'setSettings', priceMultiplier }),
+    });
+  } catch {
+    // Saved locally as fallback
+  }
 }
 
 export async function updateOrderPaidStatus(
@@ -150,13 +194,13 @@ export async function updateOrderPaidStatus(
   const customWebhook = getWebhookOverride();
   try {
     if (customWebhook) {
-      await fetch(customWebhook, {
+      await postWithRetry(customWebhook, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'updateStatus', orderId, paid, paymentMethod }),
       });
     } else {
-      await fetch('/api/orders', {
+      await postWithRetry('/api/orders', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'updateStatus', orderId, paid, paymentMethod }),

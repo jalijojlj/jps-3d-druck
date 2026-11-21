@@ -12,7 +12,13 @@ import {
 } from 'lucide-react';
 import { SHOP_CONFIG } from './config';
 import { CATEGORY_LABELS, PRODUCTS, type Product, type ProductCategory } from './data/products';
-import { formatPrice, getLocalOrders } from './lib/orders';
+import {
+  fetchAllOrders,
+  formatPrice,
+  getLocalOrders,
+  saveServerPriceMultiplier,
+  syncPendingLocalOrders,
+} from './lib/orders';
 import { LetteringConfigurator } from './components/LetteringConfigurator';
 import { ProductCard } from './components/ProductCard';
 import { ProductModal } from './components/ProductModal';
@@ -21,7 +27,18 @@ import { AdminDialog } from './components/AdminDialog';
 import type { CartItem, Order } from './types';
 
 export function App() {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('jps_3d_cart_v1');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {
+      // ignore
+    }
+    return [];
+  });
   const [category, setCategory] = useState<ProductCategory | 'alle'>('alle');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
@@ -52,9 +69,39 @@ export function App() {
     } catch {
       // ignore
     }
+    void saveServerPriceMultiplier(mult);
   };
 
+  useEffect(() => {
+    void (async () => {
+      const res = await fetchAllOrders();
+      if (res.orders.length > 0) setOrders(res.orders);
+      if (typeof res.priceMultiplier === 'number') {
+        setPriceMultiplier(res.priceMultiplier);
+        try {
+          localStorage.setItem('jps_3d_price_mult_v2', String(res.priceMultiplier));
+        } catch {
+          // ignore
+        }
+      }
+    })();
+
+    const onOnline = () => {
+      void syncPendingLocalOrders();
+    };
+    window.addEventListener('online', onOnline);
+    return () => window.removeEventListener('online', onOnline);
+  }, []);
+
   const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('jps_3d_cart_v1', JSON.stringify(cart));
+    } catch {
+      // ignore
+    }
+  }, [cart]);
 
   useEffect(() => {
     if (!toast) return;
