@@ -1094,6 +1094,16 @@ dialog.admin-modal {
   border-color: var(--accent);
 }
 
+.modal-thumb-btn.lifestyle-thumb {
+  background: var(--accent-soft);
+  border-color: rgba(184, 93, 59, 0.35);
+}
+
+.modal-thumb-btn.lifestyle-thumb.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(184, 93, 59, 0.18);
+}
+
 .modal-thumb-btn img {
   width: 34px;
   height: 34px;

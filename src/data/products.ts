@@ -66,6 +66,8 @@ export const PRODUCTS: Product[] = [
     description:
       'Ausdrucksstarke Design-Vase mit organischer Wellen-Optik, die je nach Lichteinfall faszinierende Schatten wirft.',
     badge: 'Bestseller',
+    lifestyleImage: '/products/lifestyle-vase-toscana.jpg',
+    lifestyleCaption: 'Mit Blumen',
     variants: [
       { colorName: 'Bordeaux (Groß)', colorHex: '#5B1D24', image: '/products/vase-toscana-bordeaux.jpg', weightGrams: 319 },
       { colorName: 'Taupe / Braun', colorHex: '#A68D77', image: '/products/vase-toscana-taupe.jpg', weightGrams: 165 },
@@ -92,6 +94,8 @@ export const PRODUCTS: Product[] = [
     shortDescription: 'Große, bauchige Rippen-Vase in warmem Cremeweiß.',
     description:
       'Unser großes Flaggschiff-Modell mit sanft geschwungener Silhouette und feiner vertikaler Struktur für opulente Trockenblumen-Sträuße.',
+    lifestyleImage: '/products/lifestyle-vase-elegance.jpg',
+    lifestyleCaption: 'Mit Blumen',
     variants: [
       { colorName: 'Cremeweiß', colorHex: '#F3EFE6', image: '/products/vase-elegance-creme.jpg', weightGrams: 308 },
     ],
@@ -155,6 +159,8 @@ export const PRODUCTS: Product[] = [
     description:
       'Schafft sofort Ordnung auf dem Schreibtisch oder Schminktisch: drei unterschiedlich hohe Fächer für Stifte, Pinsel, Scheren oder Kosmetik.',
     badge: 'Beliebt',
+    lifestyleImage: '/products/lifestyle-organizer-trio.jpg',
+    lifestyleCaption: 'Gefüllt mit Stiften',
     variants: [
       { colorName: 'Karamell', colorHex: '#B47D54', image: '/products/organizer-trio-karamell.jpg', weightGrams: 171 },
       { colorName: 'Altrosa', colorHex: '#E6A1B0', image: '/products/organizer-trio-rosa.jpg', weightGrams: 161 },
@@ -169,6 +175,8 @@ export const PRODUCTS: Product[] = [
     description:
       'Kompakter Bad-Helfer mit seitlichem Eingriff für Wattepads und separatem Fach für Wattestäbchen oder Haargummis.',
     badge: 'Tipp',
+    lifestyleImage: '/products/lifestyle-bad-spa.jpg',
+    lifestyleCaption: 'Mit Wattepads',
     variants: [
       { colorName: 'Cremeweiß', colorHex: '#F3EFE6', image: '/products/bad-spa-weiss.jpg', weightGrams: 58 },
       { colorName: 'Sand / Beige', colorHex: '#D8C7AE', image: '/products/bad-spa-beige.jpg', weightGrams: 64 },
@@ -233,6 +241,8 @@ export const PRODUCTS: Product[] = [
     shortDescription: 'Ständer mit runder Ablageschale für Armbänder, Haargummis & Ringe.',
     description:
       'Minimalistischer Halter mit hoher Säule und praktischer Schale am Fuß — ideal für Scrunchies, Armbänder oder Schmuck.',
+    lifestyleImage: '/products/lifestyle-organizer-aura.jpg',
+    lifestyleCaption: 'Im Einsatz',
     variants: [
       { colorName: 'Reinweiß', colorHex: '#FFFFFF', image: '/products/organizer-aura-weiss.jpg', weightGrams: 88 },
       { colorName: 'Sand / Beige', colorHex: '#D8C7AE', image: '/products/organizer-aura-beige.jpg', weightGrams: 85 },
@@ -310,6 +320,8 @@ export const PRODUCTS: Product[] = [
     description:
       'Genialer Handy- & Mini-Tablet-Ständer für Schreibtisch, Küche oder unterwegs. Lässt sich komplett flach zusammenklappen und passt in jede Tasche.',
     badge: 'Bestseller',
+    lifestyleImage: '/products/lifestyle-handyhalter-hex.jpg',
+    lifestyleCaption: 'Mit Smartphone',
     variants: [
       { colorName: 'Weiß / Rosa', colorHex: '#E6A1B0', image: '/products/handyhalter-hex-rosa.jpg', weightGrams: 83 },
       { colorName: 'Weiß / Hellblau', colorHex: '#8CC5E3', image: '/products/handyhalter-hex-blau.jpg', weightGrams: 82 },
