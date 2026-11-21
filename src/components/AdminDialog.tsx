@@ -32,6 +32,8 @@ interface AdminDialogProps {
   onClose: () => void;
   orders: Order[];
   onOrdersUpdated: (orders: Order[]) => void;
+  priceMultiplier: number;
+  onPriceMultiplierChange: (multiplier: number) => void;
 }
 
 export function AdminDialog({
@@ -41,6 +43,8 @@ export function AdminDialog({
   onClose,
   orders,
   onOrdersUpdated,
+  priceMultiplier,
+  onPriceMultiplierChange,
 }: AdminDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [pinInput, setPinInput] = useState('');
@@ -227,6 +231,33 @@ export function AdminDialog({
                 </div>
               </form>
             )}
+
+            <div className="webhook-settings-box">
+              <label>Preise live anpassen (aktuell: {Math.round((priceMultiplier - 1) * 100)}%)</label>
+              <div className="admin-filter-tabs" style={{ flexWrap: 'wrap' }}>
+                {[
+                  { label: '-40 %', mult: 0.6 },
+                  { label: '-30 % (Standard)', mult: 0.7 },
+                  { label: '-20 %', mult: 0.8 },
+                  { label: '-10 %', mult: 0.9 },
+                  { label: 'Normal (0 %)', mult: 1.0 },
+                  { label: '+10 %', mult: 1.1 },
+                ].map((opt) => (
+                  <button
+                    key={opt.label}
+                    type="button"
+                    className={Math.abs(priceMultiplier - opt.mult) < 0.005 ? 'is-active' : ''}
+                    onClick={() => onPriceMultiplierChange(opt.mult)}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              <p className="field-note">
+                Alle Produkt- und Schriftzug-Preise passen sich sofort an (gerundet auf 0,50 €).
+                Dauerhaft änderbar in <code>src/config.ts</code>.
+              </p>
+            </div>
 
             <div className="kpi-grid">
               <div className="kpi-card">

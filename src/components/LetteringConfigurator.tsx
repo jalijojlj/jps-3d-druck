@@ -12,6 +12,7 @@ import { formatPrice } from '../lib/orders';
 import type { CartItem } from '../types';
 
 interface LetteringConfiguratorProps {
+  priceMultiplier: number;
   onAddToCart: (item: CartItem, openCheckout?: boolean) => void;
 }
 
@@ -39,7 +40,7 @@ const EXAMPLES = [
   },
 ];
 
-export function LetteringConfigurator({ onAddToCart }: LetteringConfiguratorProps) {
+export function LetteringConfigurator({ priceMultiplier, onAddToCart }: LetteringConfiguratorProps) {
   const [text, setText] = useState('trust');
   const [fontId, setFontId] = useState<string>('serif');
   const [heightCm, setHeightCm] = useState<number>(12);
@@ -55,7 +56,7 @@ export function LetteringConfigurator({ onAddToCart }: LetteringConfiguratorProp
   const finalWidthLabel = customWidthCm.trim()
     ? `${customWidthCm.trim()} cm (Wunschbreite)`
     : `ca. ${estimatedWidth} cm`;
-  const price = calculateLetteringPrice(displayText, heightCm, thicknessCm);
+  const price = calculateLetteringPrice(displayText, heightCm, thicknessCm, priceMultiplier);
 
   // Build layered 3D extrusion shadow based on thickness (1, 2, or 3 cm)
   const depthLayers = thicknessCm === 1 ? 3 : thicknessCm === 2 ? 6 : 10;

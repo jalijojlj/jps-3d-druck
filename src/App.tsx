@@ -32,6 +32,27 @@ export function App() {
   const [adminOpen, setAdminOpen] = useState(false);
   const [sellerUnlocked, setSellerUnlocked] = useState(false);
   const [orders, setOrders] = useState<Order[]>(() => getLocalOrders());
+  const [priceMultiplier, setPriceMultiplier] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('jps_3d_price_mult_v1');
+      if (saved) {
+        const num = Number(saved);
+        if (Number.isFinite(num) && num >= 0.2 && num <= 3) return num;
+      }
+    } catch {
+      // ignore
+    }
+    return SHOP_CONFIG.priceMultiplier;
+  });
+
+  const handlePriceMultiplierChange = (mult: number) => {
+    setPriceMultiplier(mult);
+    try {
+      localStorage.setItem('jps_3d_price_mult_v1', String(mult));
+    } catch {
+      // ignore
+    }
+  };
 
   const [toast, setToast] = useState<string | null>(null);
 
@@ -208,7 +229,7 @@ export function App() {
         </section>
 
         {/* CUSTOM 3D LETTERING CONFIGURATOR */}
-        <LetteringConfigurator onAddToCart={addToCart} />
+        <LetteringConfigurator priceMultiplier={priceMultiplier} onAddToCart={addToCart} />
 
         {/* PRODUCT CATALOG */}
         <section id="produkte" className="catalog-section" aria-labelledby="catalog-heading">
@@ -270,6 +291,7 @@ export function App() {
                   <ProductCard
                     key={product.id}
                     product={product}
+                    priceMultiplier={priceMultiplier}
                     onOpenDetail={setActiveProduct}
                     onQuickAdd={(item) => addToCart(item, false)}
                   />
@@ -331,6 +353,7 @@ export function App() {
       {/* MODALS */}
       <ProductModal
         product={activeProduct}
+        priceMultiplier={priceMultiplier}
         onClose={() => setActiveProduct(null)}
         onAddToCart={addToCart}
       />
@@ -355,6 +378,8 @@ export function App() {
         onClose={() => setAdminOpen(false)}
         orders={orders}
         onOrdersUpdated={setOrders}
+        priceMultiplier={priceMultiplier}
+        onPriceMultiplierChange={handlePriceMultiplierChange}
       />
     </div>
   );

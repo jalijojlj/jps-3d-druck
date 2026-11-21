@@ -24,9 +24,17 @@ export const SHOP_CONFIG = {
   paypalMeUrl: '',
   // Kurzer Verkäufer-Code für den Stand-Modus (Bar-Bezahlung direkt als "Bezahlt" abhaken & Bestellübersicht öffnen)
   sellerPin: '2026',
+  // Globaler Preisfaktor: 0.70 = 30 % günstiger, 1.0 = Basispreis, 1.10 = +10 % (auch live im Stand-Modus änderbar!)
+  priceMultiplier: 0.7,
   shippingCost: 4.9,
   freeShippingFrom: 45,
 };
+
+export function applyPriceMultiplier(basePrice: number, multiplier = SHOP_CONFIG.priceMultiplier): number {
+  const scaled = basePrice * multiplier;
+  // Auf glatte 0,50 € runden (ideal für Wechselgeld am Stand)
+  return Math.max(1, Math.round(scaled * 2) / 2);
+}
 
 export const FILAMENT_COLORS: FilamentColor[] = [
   { id: 'creme', name: 'Cremeweiß', hex: '#F3EFE6', border: '#D6CFC2' },
@@ -93,15 +101,20 @@ export const LETTERING_FONTS: FontOption[] = [
   },
 ];
 
-export function calculateLetteringPrice(text: string, heightCm: number, thicknessCm: number): number {
+export function calculateLetteringPrice(
+  text: string,
+  heightCm: number,
+  thicknessCm: number,
+  multiplier = SHOP_CONFIG.priceMultiplier
+): number {
   const cleanChars = text.replace(/\s+/g, '').length;
   const effectiveChars = Math.max(2, cleanChars);
   const heightMeta = LETTERING_HEIGHTS.find((h) => h.cm === heightCm) ?? LETTERING_HEIGHTS[0];
   const thickMeta = LETTERING_THICKNESSES.find((t) => t.cm === thicknessCm) ?? LETTERING_THICKNESSES[0];
 
   const base = 7.0 + effectiveChars * 1.4;
-  const raw = base * heightMeta.priceFactor + thickMeta.priceAdd;
-  return Math.round(raw * 2) / 2; // Auf 0,50 € runden
+  const raw = (base * heightMeta.priceFactor + thickMeta.priceAdd) * multiplier;
+  return Math.max(3, Math.round(raw * 2) / 2); // Auf 0,50 € runden
 }
 
 export function estimateLetteringWidthCm(text: string, heightCm: number, fontId: string): number {

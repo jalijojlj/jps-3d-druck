@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { X, ShoppingBag, Zap, Minus, Plus } from 'lucide-react';
-import { FILAMENT_COLORS } from '../config';
+import { applyPriceMultiplier, FILAMENT_COLORS } from '../config';
 import { formatPrice } from '../lib/orders';
 import { attachDialogLightDismissFallback } from '../lib/dialogUtils';
 import type { Product } from '../data/products';
@@ -8,11 +8,12 @@ import type { CartItem } from '../types';
 
 interface ProductModalProps {
   product: Product | null;
+  priceMultiplier: number;
   onClose: () => void;
   onAddToCart: (item: CartItem, openCheckout?: boolean) => void;
 }
 
-export function ProductModal({ product, onClose, onAddToCart }: ProductModalProps) {
+export function ProductModal({ product, priceMultiplier, onClose, onAddToCart }: ProductModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [variantIndex, setVariantIndex] = useState(0);
   const [customColorName, setCustomColorName] = useState<string>('');
@@ -46,6 +47,7 @@ export function ProductModal({ product, onClose, onAddToCart }: ProductModalProp
   };
 
   const activeVariant = product?.variants[variantIndex] ?? product?.variants[0];
+  const effectivePrice = product ? applyPriceMultiplier(product.price, priceMultiplier) : 0;
 
   const handleConfirm = (openCheckout: boolean) => {
     if (!product || !activeVariant) return;
@@ -56,7 +58,7 @@ export function ProductModal({ product, onClose, onAddToCart }: ProductModalProp
         cartId: `${product.id}-${chosenColor}`,
         productId: product.id,
         name: product.name,
-        price: product.price,
+        price: effectivePrice,
         quantity,
         image: activeVariant.image,
         colorName: chosenColor,
@@ -115,7 +117,7 @@ export function ProductModal({ product, onClose, onAddToCart }: ProductModalProp
           <div className="product-modal-body">
             {product.badge && <span className="product-badge">{product.badge}</span>}
             <h2 id="product-modal-title">{product.name}</h2>
-            <div className="modal-price">{formatPrice(product.price)}</div>
+            <div className="modal-price">{formatPrice(effectivePrice)}</div>
             <p className="modal-desc">{product.description}</p>
 
             <div className="config-group">

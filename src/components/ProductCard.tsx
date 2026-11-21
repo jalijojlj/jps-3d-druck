@@ -1,20 +1,23 @@
 import { useState } from 'react';
 import { Plus, Check } from 'lucide-react';
+import { applyPriceMultiplier } from '../config';
 import { formatPrice } from '../lib/orders';
 import type { Product } from '../data/products';
 import type { CartItem } from '../types';
 
 interface ProductCardProps {
   product: Product;
+  priceMultiplier: number;
   onOpenDetail: (product: Product) => void;
   onQuickAdd: (item: CartItem) => void;
 }
 
-export function ProductCard({ product, onOpenDetail, onQuickAdd }: ProductCardProps) {
+export function ProductCard({ product, priceMultiplier, onOpenDetail, onQuickAdd }: ProductCardProps) {
   const [variantIdx, setVariantIdx] = useState(0);
   const [justAdded, setJustAdded] = useState(false);
 
   const variant = product.variants[variantIdx] ?? product.variants[0];
+  const effectivePrice = applyPriceMultiplier(product.price, priceMultiplier);
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -22,7 +25,7 @@ export function ProductCard({ product, onOpenDetail, onQuickAdd }: ProductCardPr
       cartId: `${product.id}-${variant.colorName}`,
       productId: product.id,
       name: product.name,
-      price: product.price,
+      price: effectivePrice,
       quantity: 1,
       image: variant.image,
       colorName: variant.colorName,
@@ -63,7 +66,7 @@ export function ProductCard({ product, onOpenDetail, onQuickAdd }: ProductCardPr
               {product.name}
             </button>
           </h3>
-          <span className="product-card-price">{formatPrice(product.price)}</span>
+          <span className="product-card-price">{formatPrice(effectivePrice)}</span>
         </div>
 
         <p className="product-card-desc">{product.shortDescription}</p>
