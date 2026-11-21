@@ -7,7 +7,9 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+  const webhookUrl =
+    process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
+    'https://script.google.com/macros/s/AKfycbwvqpxWvseVwVCsrBTLw6CgvA_6XZPPfcduBAx6PCST0kPsj_94iAR-VrP5JFl26z7i/exec';
 
   if (!webhookUrl) {
     if (req.method === 'GET') {
