@@ -183,12 +183,20 @@ export function AdminDialog({
               </div>
 
               <div className="admin-toolbar-actions">
+                <a
+                  href={SHOP_CONFIG.googleSheetUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-secondary btn-sm"
+                >
+                  Google Sheet ↗
+                </a>
                 <button
                   type="button"
                   className="btn btn-secondary btn-sm"
                   onClick={() => setShowSettings((s) => !s)}
                 >
-                  <Settings size={15} aria-hidden="true" /> Google Sheet URL
+                  <Settings size={15} aria-hidden="true" /> Webhook
                 </button>
                 <button
                   type="button"
@@ -236,11 +244,11 @@ export function AdminDialog({
               <label>Preise live anpassen (aktuell: {Math.round((priceMultiplier - 1) * 100)}%)</label>
               <div className="admin-filter-tabs" style={{ flexWrap: 'wrap' }}>
                 {[
+                  { label: '-75 %', mult: 0.25 },
+                  { label: '-70 % (Standard)', mult: 0.3 },
                   { label: '-60 %', mult: 0.4 },
-                  { label: '-55 %', mult: 0.45 },
-                  { label: '-50 % (Standard)', mult: 0.5 },
+                  { label: '-50 %', mult: 0.5 },
                   { label: '-40 %', mult: 0.6 },
-                  { label: '-30 %', mult: 0.7 },
                   { label: 'Normal (0 %)', mult: 1.0 },
                 ].map((opt) => (
                   <button
