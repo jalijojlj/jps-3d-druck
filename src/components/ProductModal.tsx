@@ -16,6 +16,7 @@ interface ProductModalProps {
 export function ProductModal({ product, priceMultiplier, onClose, onAddToCart }: ProductModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [variantIndex, setVariantIndex] = useState(0);
+  const [showLifestyle, setShowLifestyle] = useState(false);
   const [customColorName, setCustomColorName] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
 
@@ -25,6 +26,7 @@ export function ProductModal({ product, priceMultiplier, onClose, onAddToCart }:
 
     if (product) {
       setVariantIndex(0);
+      setShowLifestyle(false);
       setCustomColorName(product.variants[0]?.colorName ?? 'Cremeweiß');
       setQuantity(1);
       if (!dialog.open) {
@@ -89,19 +91,24 @@ export function ProductModal({ product, priceMultiplier, onClose, onAddToCart }:
 
           <div className="product-modal-media">
             <img
-              src={activeVariant.image}
-              alt={`${product.name} in ${activeVariant.colorName}`}
+              src={showLifestyle && product.lifestyleImage ? product.lifestyleImage : activeVariant.image}
+              alt={
+                showLifestyle && product.lifestyleCaption
+                  ? `${product.name} — ${product.lifestyleCaption}`
+                  : `${product.name} in ${activeVariant.colorName}`
+              }
               width={600}
               height={600}
             />
-            {product.variants.length > 1 && (
+            {(product.variants.length > 1 || product.lifestyleImage) && (
               <div className="modal-thumbs">
                 {product.variants.map((v, idx) => (
                   <button
                     key={v.image}
                     type="button"
-                    className={`modal-thumb-btn ${idx === variantIndex ? 'is-active' : ''}`}
+                    className={`modal-thumb-btn ${!showLifestyle && idx === variantIndex ? 'is-active' : ''}`}
                     onClick={() => {
+                      setShowLifestyle(false);
                       setVariantIndex(idx);
                       setCustomColorName(v.colorName);
                     }}
@@ -110,6 +117,21 @@ export function ProductModal({ product, priceMultiplier, onClose, onAddToCart }:
                     <span>{v.colorName}</span>
                   </button>
                 ))}
+                {product.lifestyleImage && (
+                  <button
+                    type="button"
+                    className={`modal-thumb-btn lifestyle-thumb ${showLifestyle ? 'is-active' : ''}`}
+                    onClick={() => setShowLifestyle(true)}
+                  >
+                    <img
+                      src={product.lifestyleImage}
+                      alt={product.lifestyleCaption || 'Im Einsatz'}
+                      width={72}
+                      height={72}
+                    />
+                    <span>✨ {product.lifestyleCaption || 'Im Einsatz'}</span>
+                  </button>
+                )}
               </div>
             )}
           </div>

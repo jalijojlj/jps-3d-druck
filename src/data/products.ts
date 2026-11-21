@@ -16,6 +16,8 @@ export interface Product {
   description: string;
   dimensionsNote?: string;
   badge?: string;
+  lifestyleImage?: string;
+  lifestyleCaption?: string;
   variants: ProductVariant[];
 }
 
