@@ -14,6 +14,7 @@
  *    Environment Variable "GOOGLE_SHEETS_WEBHOOK_URL" ein (oder direkt im Admin-Menü der Webseite).
  */
 
+const SPREADSHEET_ID = '1UKULoyYdh0dklWaA2ixIM6Ff67bPj7SG0G-deQg66UA';
 const SHEET_NAME = 'Bestellungen';
 const HEADERS = [
   'Bestell-Nr',
@@ -32,7 +33,7 @@ const HEADERS = [
 ];
 
 function getOrCreateSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
