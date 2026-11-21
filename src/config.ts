@@ -24,8 +24,8 @@ export const SHOP_CONFIG = {
   paypalMeUrl: '',
   // Kurzer Verkäufer-Code für den Stand-Modus (Bar-Bezahlung direkt als "Bezahlt" abhaken & Bestellübersicht öffnen)
   sellerPin: '2026',
-  // Globaler Preisfaktor: 0.24 = nochmals 20 % günstiger (-76 % vom Ursprungspreis), auch live im Stand-Modus änderbar!
-  priceMultiplier: 0.24,
+  // Globaler Preisfaktor: 0.20 = -80 % vom Ursprungspreis (auch live im Stand-Modus änderbar!)
+  priceMultiplier: 0.2,
   googleSheetUrl: 'https://docs.google.com/spreadsheets/d/1UKULoyYdh0dklWaA2ixIM6Ff67bPj7SG0G-deQg66UA/edit',
   shippingCost: 4.9,
   freeShippingFrom: 45,

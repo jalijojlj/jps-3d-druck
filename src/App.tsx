@@ -51,7 +51,7 @@ export function App() {
   const [orders, setOrders] = useState<Order[]>(() => getLocalOrders());
   const [priceMultiplier, setPriceMultiplier] = useState<number>(() => {
     try {
-      const saved = localStorage.getItem('jps_3d_price_mult_v3');
+      const saved = localStorage.getItem('jps_3d_price_mult_v4');
       if (saved) {
         const num = Number(saved);
         if (Number.isFinite(num) && num >= 0.2 && num <= 3) return num;
@@ -65,7 +65,7 @@ export function App() {
   const handlePriceMultiplierChange = (mult: number) => {
     setPriceMultiplier(mult);
     try {
-      localStorage.setItem('jps_3d_price_mult_v3', String(mult));
+      localStorage.setItem('jps_3d_price_mult_v4', String(mult));
     } catch {
       // ignore
     }
@@ -79,7 +79,7 @@ export function App() {
       if (typeof res.priceMultiplier === 'number') {
         setPriceMultiplier(res.priceMultiplier);
         try {
-          localStorage.setItem('jps_3d_price_mult_v3', String(res.priceMultiplier));
+          localStorage.setItem('jps_3d_price_mult_v4', String(res.priceMultiplier));
         } catch {
           // ignore
         }
