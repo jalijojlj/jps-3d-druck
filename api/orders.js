@@ -1,3 +1,6 @@
+const DEFAULT_BACKEND_URL = 'https://clarity-likewise-emotions-cups.trycloudflare.com';
+const DEFAULT_BACKEND_SECRET = 'jps3d-stand-2026-x9k2';
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
@@ -7,29 +10,17 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const webhookUrl =
-    process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
-    'https://script.google.com/macros/s/AKfycbwvqpxWvseVwVCsrBTLw6CgvA_6XZPPfcduBAx6PCST0kPsj_94iAR-VrP5JFl26z7i/exec';
-
-  if (!webhookUrl) {
-    if (req.method === 'GET') {
-      return res.status(200).json({
-        connected: false,
-        orders: [],
-        message: 'GOOGLE_SHEETS_WEBHOOK_URL ist noch nicht in Vercel hinterlegt. Bestellungen werden lokal im Browser gespeichert.',
-      });
-    }
-    return res.status(200).json({
-      connected: false,
-      savedLocallyOnly: true,
-      message: 'Bestellung lokal gespeichert (Google Sheets noch nicht verbunden).',
-    });
-  }
+  const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL || DEFAULT_BACKEND_URL;
+  const isMiniPcBackend = !process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+  const authHeaders = isMiniPcBackend
+    ? { 'X-JPS-Secret': process.env.JPS_ORDER_SECRET || DEFAULT_BACKEND_SECRET }
+    : {};
 
   try {
     if (req.method === 'GET') {
       const response = await fetch(webhookUrl, {
         method: 'GET',
+        headers: authHeaders,
         redirect: 'follow',
       });
       const text = await response.text();
@@ -38,8 +29,8 @@ export default async function handler(req, res) {
         data = JSON.parse(text);
       } catch {
         return res.status(502).json({
-          connected: true,
-          error: 'Google Sheets lieferte kein gültiges JSON zurück.',
+          connected: false,
+          error: 'Backend lieferte kein gültiges JSON zurück.',
           orders: [],
         });
       }
@@ -58,7 +49,10 @@ export default async function handler(req, res) {
 
       const response = await fetch(webhookUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        headers: {
+          'Content-Type': isMiniPcBackend ? 'application/json' : 'text/plain;charset=utf-8',
+          ...authHeaders,
+        },
         body: JSON.stringify(bodyToSend),
         redirect: 'follow',
       });
@@ -68,11 +62,11 @@ export default async function handler(req, res) {
       try {
         data = JSON.parse(text);
       } catch {
-        // Apps Script sometimes returns HTML on redirect edge cases
+        // Fallback if non-JSON
       }
 
-      return res.status(200).json({
-        connected: true,
+      return res.status(response.ok ? 200 : 502).json({
+        connected: response.ok,
         ...data,
       });
     }
@@ -80,7 +74,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (err) {
     return res.status(500).json({
-      connected: true,
+      connected: false,
       error: err instanceof Error ? err.message : 'Unbekannter Serverfehler',
     });
   }

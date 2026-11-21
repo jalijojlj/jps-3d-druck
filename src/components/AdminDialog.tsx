@@ -173,7 +173,7 @@ export function AdminDialog({
               <div className={`sheets-pill ${sheetsConnected ? 'is-online' : 'is-local'}`}>
                 {sheetsConnected ? (
                   <>
-                    <Cloud size={15} aria-hidden="true" /> Google Sheets aktiv
+                    <Cloud size={15} aria-hidden="true" /> Server-Sync aktiv
                   </>
                 ) : (
                   <>
